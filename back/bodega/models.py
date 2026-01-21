@@ -4,22 +4,12 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 
-
-# =========================
-# BASE
-# =========================
-
 class TimeStampedModel(models.Model):
-    creado_en = models.DateTimeField(auto_now_add=True)   # fecha de creación
-    actualizado_en = models.DateTimeField(auto_now=True)  # fecha última edición
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
-
-
-# =========================
-# MAESTROS
-# =========================
 
 class Categoria(TimeStampedModel):
     nombre = models.CharField(max_length=120, unique=True)
@@ -32,7 +22,6 @@ class Categoria(TimeStampedModel):
     def __str__(self):
         return self.nombre
 
-
 class Marca(TimeStampedModel):
     nombre = models.CharField(max_length=120, unique=True)
     activa = models.BooleanField(default=True)
@@ -42,7 +31,6 @@ class Marca(TimeStampedModel):
 
     def __str__(self):
         return self.nombre
-
 
 class UnidadMedida(TimeStampedModel):
     nombre = models.CharField(max_length=120, unique=True)
@@ -54,7 +42,6 @@ class UnidadMedida(TimeStampedModel):
 
     def __str__(self):
         return f"{self.nombre} ({self.simbolo})" if self.simbolo else self.nombre
-
 
 class Proveedor(TimeStampedModel):
     nombre = models.CharField(max_length=200)
@@ -71,13 +58,8 @@ class Proveedor(TimeStampedModel):
     def __str__(self):
         return self.nombre
 
-
-# =========================
-# PRODUCTOS
-# =========================
-
 class Producto(TimeStampedModel):
-    sku = models.CharField(max_length=60, unique=True)  # código interno
+    sku = models.CharField(max_length=60, unique=True)
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True, default="")
     codigo_barra = models.CharField(max_length=80, blank=True, default="")
@@ -108,7 +90,6 @@ class Producto(TimeStampedModel):
     def __str__(self):
         return f"{self.sku} - {self.nombre}"
 
-
 class ProductoProveedor(TimeStampedModel):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="proveedores")
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT, related_name="productos")
@@ -124,11 +105,6 @@ class ProductoProveedor(TimeStampedModel):
 
     def __str__(self):
         return f"{self.producto.sku} -> {self.proveedor.nombre}"
-
-
-# =========================
-# BODEGAS Y STOCK
-# =========================
 
 class Bodega(TimeStampedModel):
     nombre = models.CharField(max_length=120, unique=True)
@@ -158,10 +134,6 @@ class Stock(TimeStampedModel):
         return f"{self.bodega} | {self.producto.sku} = {self.cantidad}"
 
 
-# =========================
-# MOVIMIENTOS (BASE)
-# =========================
-
 class BaseMovimiento(TimeStampedModel):
     class Estado(models.TextChoices):
         BORRADOR = "BORRADOR", "Borrador"
@@ -186,7 +158,7 @@ class BaseMovimiento(TimeStampedModel):
             raise ValidationError("Debe seleccionar una bodega.")
 
     def _lineas(self):
-        return list(self.lineas.all())  # obtiene líneas
+        return list(self.lineas.all())
 
     def _validar_lineas(self):
         lineas = self._lineas()
@@ -209,11 +181,6 @@ class BaseMovimiento(TimeStampedModel):
         stock_map[key] = s
         return s
 
-
-# =========================
-# MOVIMIENTO ENTRADA
-# =========================
-
 class MovimientoEntrada(BaseMovimiento):
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT, null=True, blank=True, related_name="entradas")  # proveedor opcional
 
@@ -234,11 +201,6 @@ class MovimientoEntrada(BaseMovimiento):
         self.estado = self.Estado.POSTEADO
         self.posteado_en = timezone.now()
         self.save()
-
-
-# =========================
-# MOVIMIENTO SALIDA
-# =========================
 
 class MovimientoSalida(BaseMovimiento):
     destino = models.CharField(max_length=120, blank=True, default="")  # destino/cliente/área
@@ -264,11 +226,6 @@ class MovimientoSalida(BaseMovimiento):
         self.estado = self.Estado.POSTEADO
         self.posteado_en = timezone.now()
         self.save()
-
-
-# =========================
-# LÍNEAS (COMPARTIDAS)
-# =========================
 
 class MovimientoLinea(TimeStampedModel):
     movimiento_entrada = models.ForeignKey(
