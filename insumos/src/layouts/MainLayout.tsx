@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 type Props = {
   children: ReactNode;
@@ -7,9 +8,10 @@ type Props = {
 
 export default function MainLayout({ children }: Props) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="flex-1 w-full">{children}</main>
+      <Footer />
     </div>
   );
 }
