@@ -16,5 +16,5 @@ router.register(r"movimientos-entrada", MovimientoEntradaViewSet)
 router.register(r"movimientos-salida", MovimientoSalidaViewSet)
 
 urlpatterns = [
-    path("api/", include(router.urls)),
+    path("", include(router.urls)),
 ]

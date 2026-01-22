@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-8fpj!8d@rvgfz#90#jhqqdq5k%=1$2ocz)5^*t+h3!54ixl2+r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Para desarrollo local
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Apps externas
     'rest_framework',
     'corsheaders',
     'bodega',
@@ -110,7 +113,6 @@ LANGUAGE_CODE = "es-cl"
 TIME_ZONE = "America/Santiago"
 
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -119,7 +121,22 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+# ==============================
+# CORS CONFIG (React + Vite)
+# ==============================
+
+# Vite corre en el puerto 5173
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",
-    "http://127.0.0.1:4200",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# Si usarás cookies / sesión / login (fetch con credentials o axios withCredentials)
+CORS_ALLOW_CREDENTIALS = True
+
+# Recomendado para evitar error de CSRF al trabajar con Vite
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
