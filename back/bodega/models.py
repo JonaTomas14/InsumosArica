@@ -127,7 +127,8 @@ class Stock(TimeStampedModel):
         unique_together = [("bodega", "producto")]
         indexes = [models.Index(fields=["bodega", "producto"])]
         constraints = [
-            models.CheckConstraint(check=Q(cantidad__gte=0), name="stock_no_negativo"),
+            models.CheckConstraint(condition=Q(cantidad__gte=0), name="stock_no_negativo"),
+
         ]
 
     def __str__(self):
@@ -203,7 +204,7 @@ class MovimientoEntrada(BaseMovimiento):
         self.save()
 
 class MovimientoSalida(BaseMovimiento):
-    destino = models.CharField(max_length=120, blank=True, default="")  # destino/cliente/área
+    destino = models.CharField(max_length=120, blank=True, default="")
 
     @transaction.atomic
     def postear(self):
@@ -246,7 +247,7 @@ class MovimientoLinea(TimeStampedModel):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     (Q(movimiento_entrada__isnull=False) & Q(movimiento_salida__isnull=True)) |
                     (Q(movimiento_entrada__isnull=True) & Q(movimiento_salida__isnull=False))
                 ),
